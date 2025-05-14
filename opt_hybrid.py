@@ -216,9 +216,10 @@ def local_optimization(objective_function, clustered_regions, n_starts=1):
 
 # VISUALIZATION FUNCTIONS
 
-# Plot best solution evolution at each iteration
+# Plot cumulative best FoM solution at each iteration
 def plot_best_fom_iter(df_global, df_local, save = False):
-    # global optimization
+    
+    # Compute cumulative best FoM for global optimization
     global_best_fom = []
     current_best = float('inf')
     global_iterations = sorted(df_global["Iteration"].unique())
@@ -260,3 +261,68 @@ def plot_best_fom_iter(df_global, df_local, save = False):
     if save:
         plt.savefig("best_fom_per_iter.svg", dpi = 300)
 
+# Plot cumulative best FoM solution evolution through function evaluations
+def plot_best_fom_calc(df_global, df_local, save = False):
+    # Sort by iteration
+    df_global = df_global.sort_values(by="Iteration")
+
+    # Compute cumulative best FoM for global optimization
+    best_global_fom = []
+    current_best = float('inf')
+    for _, row in df_global.iterrows():
+        current_best = min(current_best, row["FoM"])
+        best_global_fom.append(current_best)
+
+    # Number of global function evaluations
+    global_steps = list(range(len(best_global_fom)))
+
+    # Compute cumulative best FoM for local optimization
+    best_local_fom = []
+    current_best = best_global_fom[-1]
+    for _, row in df_local.iterrows():
+        current_best = min(current_best, row["FoM"])
+        best_local_fom.append(current_best)
+
+    local_steps = list(range(len(global_steps), len(global_steps) + len(best_local_fom)))
+
+    # Plot
+    plt.figure(figsize=(7, 5))
+    plt.plot(global_steps, best_global_fom, '-o', label="Global Optimization", color='black', markersize=4)
+    plt.plot(local_steps, best_local_fom, '-o', label="Local Optimization", color='m', markersize=3)
+    plt.axvline(x=len(global_steps) - 1, color='gray', linestyle='--', label='Global/Local Transition')
+    plt.xlabel("Function Evaluations")
+    plt.ylabel("Best FoM")
+    plt.yscale("log")
+    plt.grid(True, linestyle='--', alpha=0.6)
+    plt.legend()
+    plt.tight_layout()
+
+    if save:
+        plt.savefig("best_fom_per_eval.svg", dpi = 300)
+
+# Plot regions of global iterations
+def plot_global_iterations(objective_function, csv_file, bounds, save = False):
+    df = pd.read_csv(csv_file)
+    iterations = df["Iteration"].unique()
+    
+    x_vals = np.linspace(bounds[0][0], bounds[0][1], 100)
+    y_vals = np.linspace(bounds[1][0], bounds[1][1], 100)
+    X, Y = np.meshgrid(x_vals, y_vals)
+    Z = objective_function((X, Y))
+    
+    Z_log = np.log1p(np.abs(Z))
+    
+    for iteration in iterations:
+        plt.figure(figsize=(8, 6))
+        plt.imshow(Z_log, extent=[bounds[0][0], bounds[0][1], bounds[1][0], bounds[1][1]], origin='lower', cmap="viridis", aspect='auto')
+        
+        iter_data = df[df["Iteration"] == iteration]
+        plt.scatter(iter_data["X"], iter_data["Y"], c='r', edgecolors='k')
+        plt.colorbar(label="FoM")
+
+        plt.xlabel("X")
+        plt.ylabel("Y")
+        plt.title(f"Iteration {iteration}")
+        
+        if save:
+            plt.savefig(f'iteration_{iteration}.svg')
