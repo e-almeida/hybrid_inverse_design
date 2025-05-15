@@ -2,6 +2,7 @@ import numpy as np
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 plt.rcParams["svg.fonttype"] = "none"
 plt.rcParams['figure.autolayout'] = True
@@ -326,3 +327,37 @@ def plot_global_iterations(objective_function, csv_file, bounds, save = False):
         
         if save:
             plt.savefig(f'iteration_{iteration}.svg')
+
+# Plot final clusters
+def plot_clustered_regions(objective_function, clustered_regions, bounds, save = False):
+    fig, ax = plt.subplots(figsize=(8, 8))
+    
+    # Plot the full bounds as a background
+    ax.set_xlim(bounds[0][0], bounds[0][1])
+    ax.set_ylim(bounds[1][0], bounds[1][1])
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_title('clustered regions')
+
+    
+    x_vals = np.linspace(bounds[0][0], bounds[0][1], 100)
+    y_vals = np.linspace(bounds[1][0], bounds[1][1], 100)
+    X, Y = np.meshgrid(x_vals, y_vals)
+    Z = objective_function((X, Y))
+    
+    Z_log = np.log1p(np.abs(Z))
+    plt.imshow(Z_log, extent=[bounds[0][0], bounds[0][1], bounds[1][0], bounds[1][1]], origin='lower', cmap="viridis", aspect='auto')
+
+    # Plot each cluster as a rectangle
+    for idx, region in enumerate(clustered_regions):
+        x_min, x_max = region[0]
+        y_min, y_max = region[1]
+        width = x_max - x_min
+        height = y_max - y_min
+        
+        rect = patches.Rectangle((x_min, y_min), width, height, 
+                                 linewidth=2, edgecolor='red', facecolor='none')
+        ax.add_patch(rect)
+    # plt.gca().set_aspect('equal', adjustable='box')
+    if save:
+        plt.savefig("clustered regions.svg", dpi = 300)
