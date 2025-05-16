@@ -1,4 +1,4 @@
-Global-to-Local Optimization Framework
+# Global-to-Local Optimization Framework
 
 This project implements a global-to-local optimization strategy tailored for metasurface design and other multi-parameter optimization problems. The approach combines:
 
