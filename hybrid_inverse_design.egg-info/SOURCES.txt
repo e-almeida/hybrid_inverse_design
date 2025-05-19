@@ -1,0 +1,8 @@
+setup.py
+hybrid_inverse_design/__init__.py
+hybrid_inverse_design/opt_hybrid.py
+hybrid_inverse_design/rgb_conversion.py
+hybrid_inverse_design.egg-info/PKG-INFO
+hybrid_inverse_design.egg-info/SOURCES.txt
+hybrid_inverse_design.egg-info/dependency_links.txt
+hybrid_inverse_design.egg-info/top_level.txt
