@@ -26,7 +26,7 @@ def _compute_gradient(fom_func, params, epsilon=1e-3):
 
 # Global Search + Space Discretization/Discarding
 def stogo_search(objective_function, bounds, max_iters, min_iters, subdivisions, initial_subdivisions,
-                 shrinkage_threshold, min_region_size_ratio, save_results=True):
+                 shrinkage_threshold, min_region_size_ratio, minimize = True, save_results=True):
     '''Run global search of the function space, by dividing it into multiple subregions ('subdivisions'),
        comparing the subestimated minima/maxima of each subregion with the best FoM so far, and discarding
        non-promising regions.
@@ -40,6 +40,7 @@ def stogo_search(objective_function, bounds, max_iters, min_iters, subdivisions,
             - shrinkage_threshold: clusters' shrinkage ratio between iterations (as percentage of the 
             largest initial space size);
             - min_region_size_ratio: minimum side of a subregion before autoshutoff;
+            
             - save_results: option to save results (default = True).
        Results:
             - csv file with coordinates, estimated best and best FoM at each iteration.
