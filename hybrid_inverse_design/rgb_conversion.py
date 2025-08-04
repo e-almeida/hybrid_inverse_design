@@ -36,11 +36,11 @@ def spectrum_to_rgb(target_wvl, reflectance):
         """
     cie_wvl, x_bar, y_bar, z_bar, d65 = load_cie_data(target_wvl)
 
-    X = np.trapezoid(reflectance * x_bar * d65, cie_wvl)
-    Y = np.trapezoid(reflectance * y_bar * d65, cie_wvl)
-    Z = np.trapezoid(reflectance * z_bar * d65, cie_wvl)
+    X = np.trapz(reflectance * x_bar * d65, cie_wvl)
+    Y = np.trapz(reflectance * y_bar * d65, cie_wvl)
+    Z = np.trapz(reflectance * z_bar * d65, cie_wvl)
     #___________________________LUMINANCE_______________________________
-    Y_ref = np.trapezoid(y_bar * d65, cie_wvl) # Y_ref represents maximum brightness
+    Y_ref = np.trapz(y_bar * d65, cie_wvl) # Y_ref represents maximum brightness
     # XYZ normalization by the total luminance of the reference white
     X /= Y_ref
     Y /= Y_ref
